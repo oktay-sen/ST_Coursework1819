@@ -43,7 +43,7 @@ public class Task3_TDD_2 {
 		Parser parser = new Parser();
 		parser.add("list", "l", Parser.STRING);
 		parser.add("l", Parser.STRING);  //l简称？
-		parser.parse("-l=1,10 --l=1,2,3"); //！！！！！！
+		parser.parse("-l=1,10 --l=1,2,3");
 		List actual = parser.getIntegerList("l");	
 		List<Integer> expected = Arrays.asList(1,10);
 		assertEquals(expected, actual);
