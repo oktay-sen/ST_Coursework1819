@@ -1,6 +1,10 @@
 package st;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 public class Parser {
 	public static final int INTEGER = 1;
@@ -205,5 +209,68 @@ public class Parser {
 		return optionMap.toString();
 	}
 
+	public int divide(int a, int b) {
+		return a/b;
+	}
+	
+	public List<Integer> getIntegerList(String option) {
+		String value = getString(option);
+		String[] valueArr= value.split("[^0-9-]"); 
+		//value = "1,2 4"
+		
+		List<Integer> result = new ArrayList<>();
+		for (String num : valueArr) {
+			if (num.isEmpty()) {
+				continue;
+			}
+			//-5--7
+			//["","5","",7]
+			//-5-7
+			//["","5","7"]
+			//5--7
+			//["5","","7"]
+			//5-7
+			//["5","7"]
+			//5-7-
+			//["5","7",""]
+			//5-7-9
+			//-5
+			//["","5"]
+			//5
+			//["5"]
+			//1-
+			//["1",""]
+			String[] split = num.split("-");
+			boolean nextIsNegative = false;
+			List<Integer> nums = new ArrayList<>();
+			for (String s : split) {
+				if (s.isEmpty()) {
+					nextIsNegative = true;
+					continue;
+				}
+				int n = Integer.parseInt(s);
+				if (nextIsNegative) {
+					n = -n;
+					nextIsNegative = false;
+				}
+				nums.add(n);
+			}
+			if (num.endsWith("-") || nums.size() > 2 || nums.isEmpty()) {
+				//Invalid input
+				return new ArrayList<>();
+			}
+			if (nums.size() == 1) {
+				result.add(nums.get(0));
+				continue;
+			}
+			Collections.sort(nums);
+			for (int i=nums.get(0); i <= nums.get(1); i++) {
+				result.add(i);
+			}
+		}
+		return result;
+	}
+		
+		
 }
 
