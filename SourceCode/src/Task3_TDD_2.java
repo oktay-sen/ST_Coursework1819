@@ -13,47 +13,15 @@ import java.util.List;
 
 public class Task3_TDD_2 {
 
+//	1.The order of search is full name of options first and then shortcut
+
 	@Test
-	public void divideWorksProperly() {
-		Parser myParser = new Parser();
-		
-		int result = myParser.divide(15, 3);
-		Assert.assertEquals(5, result);
-		
-		int result2 = myParser.divide(20, 5);
-		Assert.assertEquals(4, result2);
-	}
-	
-	//测试用力
-	@Test
-	public void exampleWorks() {
+	public void testBothShortcutAndFullname() { 
 		Parser parser = new Parser();
 		parser.add("list", "l", Parser.STRING);
-		parser.parse("--list=1,2,4-7,10");
-		List actual = parser.getIntegerList("list");
-		
-		List<Integer> expected = Arrays.asList(1,2,4,5,6,7,10);
-		
-		Assert.assertEquals(expected, actual);
-	}
-	
-	//1.The order of search is full name of options first and then shortcut
-	@Test
-	public void testBothShortcutAndFullname1() { 
-		Parser parser = new Parser();
-		parser.add("list", "l", Parser.STRING);
-		parser.add("l", Parser.STRING);  //l简称？
-		parser.parse("-l=1,10 --l=1,2,3");
-		List actual = parser.getIntegerList("l");	
-		List<Integer> expected = Arrays.asList(1,10);
-		assertEquals(expected, actual);
-	}
-	@Test
-	public void testBothShortcutAndFullname2() { 
-		Parser parser = new Parser();
-		parser.add("list", "l", Parser.STRING);
-		parser.add("l", Parser.STRING);  //l简称？
-		parser.parse("--l=1,2,3 -l=1,10"); //！！！！！！
+		parser.add("l", Parser.STRING);
+		parser.parse("-l=1,10");
+		parser.parse("--l=1,2,3");
 		List actual = parser.getIntegerList("l");	
 		List<Integer> expected = Arrays.asList(1,2,3);
 		assertEquals(expected, actual);
@@ -63,7 +31,7 @@ public class Task3_TDD_2 {
 	@Test
 	public void testOptionNoValue() { 
 		Parser parser = new Parser();
-		parser.add("option", "o", Parser.STRING);//全称，简称，赋值类型
+		parser.add("option", "o", Parser.STRING);
 		parser.parse("--option=\"\"");
 		List actual = parser.getIntegerList("option");
 		
@@ -130,6 +98,17 @@ public class Task3_TDD_2 {
 		
 		assertEquals(expected, actual);
 	}
+	@Test
+	public void testHyphensAsRange3(){ 
+		Parser parser = new Parser();
+		parser.add("list", "l", Parser.STRING);
+		parser.parse("--list=1-2,3,3-4,-4--6,1");
+		List actual = parser.getIntegerList("list");
+		
+		List<Integer> expected = Arrays.asList(-6,-5,-4,1,1,2,3,3,4);
+		
+		assertEquals(expected, actual);
+	}
 	//5.The unary prefix hyphen indicates a negative value. For example,  -7  is a negative value, -7--5  includes integers -7, -6, -5 and  -2-1  includes integers -2, -1, 0, 1.
 	@Test
 	public void testHyphensAsNegativeValue1(){ 
@@ -151,6 +130,16 @@ public class Task3_TDD_2 {
 		List<Integer> expected = Arrays.asList(-2, -1, 0, 1);		
 		assertEquals(expected, actual);
 	}
+	@Test
+	public void testHyphensAsNegativeValue3(){ 
+		Parser parser = new Parser();
+		parser.add("list", "l", Parser.STRING);
+		parser.parse("--list=-7---5");
+		List actual = parser.getIntegerList("list");
+		List<Integer> expected = Arrays.asList();
+		
+		assertEquals(expected, actual);
+	}
 	//6. Hyphens cannot be used as a suffix.  3-  , for instance, is invalid and an empty list should be returned.
 	@Test
 	public void testHyphensAsSuffix(){ 
@@ -161,4 +150,67 @@ public class Task3_TDD_2 {
 		List<Integer> expected = Arrays.asList();
 		assertEquals(expected, actual);
 	}
+	
+	
+	//test three numbers separated by 2 hyphens, eg: 1-3-5, return empty
+	@Test
+	public void testThreeNumberSeparatedByHyphens(){ 
+		Parser parser = new Parser();
+		parser.add("list", "l", Parser.STRING);
+		parser.parse("--list=1-3-5");
+		List actual = parser.getIntegerList("list");	
+		List<Integer> expected = Arrays.asList();
+		assertEquals(expected, actual);
+	}
+	//test"--",return empty
+	@Test
+	public void testAHyphens(){ 
+		Parser parser = new Parser();
+		parser.add("list", "l", Parser.STRING);
+		parser.parse("--list=--");
+		List actual = parser.getIntegerList("list");	
+		List<Integer> expected = Arrays.asList();
+		assertEquals(expected, actual);
+	}
+		//test"4--3",return -3,-2,-1,0,1,2,3,4
+		@Test
+		public void testHyphensAsNegativeValue4(){ 
+			Parser parser = new Parser();
+			parser.add("list", "l", Parser.STRING);
+			parser.parse("--list=4--3");
+			List actual = parser.getIntegerList("list");	
+			List<Integer> expected = Arrays.asList(-3,-2,-1,0,1,2,3,4);
+			assertEquals(expected, actual);
+		}
+		//test two same numbers separated by a hyphen.
+		@Test
+		public void testSameNumbersSeparatedByAHyphen(){ 
+			Parser parser = new Parser();
+			parser.add("list", "l", Parser.STRING);
+			parser.parse("--list=1-1");
+			List actual = parser.getIntegerList("list");	
+			List<Integer> expected = Arrays.asList(1);
+			assertEquals(expected, actual);
+		}
+		//test two same negative numbers separated by a hyphen
+		@Test
+		public void testSameNegativeNumbersSeparatedByAHyphen(){ 
+			Parser parser = new Parser();
+			parser.add("list", "l", Parser.STRING);
+			parser.parse("--list=-1--1");
+			List actual = parser.getIntegerList("list");	
+			List<Integer> expected = Arrays.asList(-1);
+			assertEquals(expected, actual);
+		}
+		//test "2 2"
+				@Test
+				public void testSameNum(){ 
+					Parser parser = new Parser();
+					parser.add("list", "l", Parser.STRING);
+					parser.parse("--list=\"2 2\"");
+					List actual = parser.getIntegerList("list");	
+					List<Integer> expected = Arrays.asList(2,2);
+					assertEquals(expected, actual);
+				}
+		
 }

@@ -216,35 +216,19 @@ public class Parser {
 	public List<Integer> getIntegerList(String option) {
 		String value = getString(option);
 		String[] valueArr= value.split("[^0-9-]"); 
-		//value = "1,2 4"
-		
 		List<Integer> result = new ArrayList<>();
 		for (String num : valueArr) {
 			if (num.isEmpty()) {
 				continue;
 			}
-			//-5--7
-			//["","5","",7]
-			//-5-7
-			//["","5","7"]
-			//5--7
-			//["5","","7"]
-			//5-7
-			//["5","7"]
-			//5-7-
-			//["5","7",""]
-			//5-7-9
-			//-5
-			//["","5"]
-			//5
-			//["5"]
-			//1-
-			//["1",""]
 			String[] split = num.split("-");
 			boolean nextIsNegative = false;
 			List<Integer> nums = new ArrayList<>();
 			for (String s : split) {
 				if (s.isEmpty()) {
+					if (nextIsNegative) {
+						return new ArrayList<>();
+					}
 					nextIsNegative = true;
 					continue;
 				}
@@ -268,6 +252,7 @@ public class Parser {
 				result.add(i);
 			}
 		}
+		Collections.sort(result);
 		return result;
 	}
 		
